@@ -136,8 +136,12 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
   for (const auto& hit : *pcalohits.product()) {
     EcalEBPhase2TriggerPrimitiveDigi d = hit;
     //const EBDetId TPid = d.id();
-    const float enConv = 1998.36/4095;
-    float et = d[0].encodedEt()*enConv;
+
+    //const float enConv = 1998.36/4095;
+    //float et = d[0].encodedEt()*enConv;
+    //if(et > 0) std::cout<<"encoded Et: "<<std::hex<<d[0].encodedEt()<<"\t"<<"et: "<<et<<std::endl;
+
+    float et = d[0].encodedEt()*p2eg::ECAL_LSB;
     //float eta = TPid.approxEta();
     //float phi = (TPid.iphi()*(M_PI/180));
     //std::cout<<et<<"\t"<<eta<<"\t"<<phi<<std::endl;
@@ -158,8 +162,7 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
       ehit.setPosition(GlobalVector(cell->getPosition().x(), cell->getPosition().y(), cell->getPosition().z()));
       ehit.setEnergy(et);
       ehit.setEt_uint(
-          (ap_uint<10>)et >>
-          2);  // also save the uint Et, this is to convert between 0.125 (in MC production) and 0.5 (in firmware based code)
+          (ap_uint<10>)et); //should not have bit shift
       ehit.setPt();
       ecalhits.push_back(ehit);
     }
